@@ -1,20 +1,70 @@
-\documentclass[UTF8, 11pt, a4paper]{ctexart}
+\documentclass[UTF8, 11pt, a4paper, linestretch=1.15]{ctexart}
 
-\usepackage[margin=2.5cm]{geometry}
+\usepackage[margin=2.5cm, headheight=15pt]{geometry}
+\usepackage{microtype}
+\emergencystretch=1.5em
+
 \usepackage{amsmath, amssymb, amsthm}
+\allowdisplaybreaks[2]
+
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{graphicx}
-\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage[font=small, labelfont=bf, labelsep=quad]{caption}
+
+\usepackage{enumitem}
+\setlist{topsep=4pt plus 2pt, itemsep=2pt, parsep=0pt}
+
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
+\usepackage{xcolor}
+\definecolor{linkblue}{RGB}{0, 62, 138}
+\definecolor{citeteal}{RGB}{0, 105, 92}
+\definecolor{urlpurple}{RGB}{96, 40, 140}
+\usepackage[colorlinks=true, bookmarksnumbered,
+linkcolor=linkblue, citecolor=citeteal, urlcolor=urlpurple]{hyperref}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markboth{\thesection\ #1}{}}
+\fancyhf{}
+\fancyhead[L]{\small\leftmark}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}
+	\renewcommand{\headrulewidth}{0pt}}
+
+\ctexset{
+	section = {
+		format = \Large\bfseries,
+		beforeskip = 2.2ex plus 0.6ex minus 0.2ex,
+		afterskip = 1.2ex plus 0.3ex,
+	},
+	subsection = {
+		format = \large\bfseries,
+		beforeskip = 1.8ex plus 0.5ex minus 0.2ex,
+		afterskip = 0.9ex plus 0.2ex,
+	},
+	subsubsection = { format = \normalsize\bfseries },
+}
+
+\newtheoremstyle{zhstyle}
+{0.9\baselineskip}
+{0.9\baselineskip}
+{\normalfont}
+{}
+{\bfseries}
+{}
+{0.6em}
+{}
+\theoremstyle{zhstyle}
 \newtheorem{theorem}{定理}
 \newtheorem{lemma}{引理}
 \newtheorem{corollary}{推论}
-\theoremstyle{definition}
 \newtheorem{definition}{定义}
 \newtheorem{example}{例}
-\theoremstyle{remark}
 \newtheorem{remark}{注}
 
 \newcommand{\eps}{\varepsilon}
@@ -23,101 +73,931 @@
 \newcommand{\inner}[2]{\langle #1, #2 \rangle}
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
 
-\title{Review：Tight Lower Bounds for the Distinct Elements Problem}
+\title{论文 Review：Tight Lower Bounds for the Distinct Elements Problem}
 \author{瞿池伟 \and 张天驰}
 
 \begin{document}
-\maketitle
-
-\begin{abstract}
-% TODO
-\end{abstract}
-
-\tableofcontents
-\newpage
-
-\section{论文概览}
-
-\subsection{论文基本信息}
-
-\subsection{解决的问题}
-
-\subsection{主要结果概述}
-
-\subsection{本 Review 的组织结构}
-
-\section{问题背景与动机}
-
-\subsection{数据流模型}
-
-\subsection{Distinct Elements 问题（$\Fzero$ 估计）}
-
-\subsection{应用动机}
-
-\subsection{为什么研究空间下界}
-
-\section{相关工作}
-
-\subsection{上界：$\Fzero$ 估计算法的发展}
-
-\subsection{本文之前的空间下界}
-
-\subsection{相关的通信复杂性工作}
-
-\subsection{本文发表之后的新进展}
-
-\section{论文的技术贡献}
-
-\subsection{主要定理}
-
-\subsection{证明路线图}
-
-\subsection{技术直觉}
-
-\subsection{与先前下界技术的对比}
-
-\section{技术细节与证明}
-
-\subsection{预备知识：单向通信复杂性与 Yao 极小极大原则}
-
-\subsection{VC 维与 Shatter Coefficients}
-
-\subsection{$\Pi_{l_2}(t)$ 问题的单向通信复杂度下界}
-
-\subsection{$l_2 \to l_1$ 低畸变嵌入}
-
-\subsection{从 $\Pi_{l_2}(t)$ 到 $\Fzero$ 的约化}
-
-\subsection{主定理的整合与参数范围}
-
-\section{正确性与优越性分析}
-
-\subsection{证明正确性的检验}
-
-\subsection{紧性分析：下界与上界的匹配程度}
-
-\subsection{遗留问题及其后续解决}
-
-\section{评价与讨论}
-
-\subsection{论文的非凡之处}
-
-\subsection{局限与批评}
-
-\subsection{对后续研究的影响}
-
-\subsection{本组的理解过程与心得（可选）}
-
-\section{总结}
-
-\appendix
-
-\section{记号表}
-
-\section{AI 使用记录}
-
-\begin{thebibliography}{99}
-
-\end{thebibliography}
-
+	\maketitle
+	
+	\begin{abstract}
+		
+	\end{abstract}
+	
+	\tableofcontents
+	\newpage
+	
+	\section{论文概览}
+	
+	\subsection{论文基本信息}
+	
+	本论文~\cite{IW03}题为 \emph{Tight Lower Bounds for the Distinct Elements Problem}，作者为
+	Piotr Indyk 与 David Woodruff，两人当时均任职于美国麻省理工学院（MIT）计算机科学
+	与人工智能实验室（CSAIL 前身，Theory Group）。论文发表于第 44 届 IEEE 计算机科学
+	基础年会（44th Annual IEEE Symposium on Foundations of Computer Science, FOCS 2003）。
+	FOCS 与 STOC 并称理论计算机科学领域的两大顶级会议，在算法与复杂性理论方向具有最高
+	的学术影响力。Indyk 是数据流算法与降维（locality-sensitive hashing、低畸变嵌入）方向
+	的知名学者，Woodruff 当时为 MIT 博士研究生，其后在数据流与线性代数算法方向做出了
+	一系列奠基性工作。两位作者的组合恰好对应了本文技术的两大支柱：几何嵌入与通信
+	复杂性下界。
+	
+	\subsection{解决的问题}
+	
+	一句话概括：\textbf{本文证明了在单趟数据流模型下，$(\eps, \delta)$-近似不同元素个数
+		$\Fzero$ 所需空间的紧下界 $\Omega(1/\eps^2)$，将该问题的下界从已知的 $\Omega(1/\eps)$
+		提升到与上界基本匹配的水平。}
+	
+	具体而言，论文研究的是数据流（streaming）模型中的经典问题：给定来自大小为 $m$ 的
+	全集 $[m] = \{0, 1, \dots, m-1\}$ 的一个元素流 $a = a_1, \dots, a_n$（元素按对抗性顺序
+	到达，算法只能单趟扫描），估计流中不同元素的个数 $\Fzero = \Fzero(a)$。由于存在
+	$\Omega(m)$ 的确定性空间下界，精确计算甚至确定性近似都不可行，因此研究界转而寻求
+	随机化近似算法：称算法 $\mathcal{A}$ 是 $\Fzero$ 的 $(\eps, \delta)$-近似，若其输出
+	$\tilde{F}_0$ 满足 $\Pr[|\tilde{F}_0 - \Fzero| > \eps \Fzero] < \delta$。
+	
+	在本文之前，已知的最好算法（Bar-Yossef 等人，RANDOM 2002）使用
+	$O\big(\big((1/\eps)^2 \log\log m + \log m \cdot \log(1/\eps)\big)\log(1/\delta)\big)$ 的空间，
+	而最好的空间下界只有 $\Omega(1/\eps)$（基于 $\eps$-set disjointness 问题的单向通信
+	复杂度）以及更早的 $\Omega(\log m)$。上界中主导项 $1/\eps^2$ 与下界 $1/\eps$ 之间存在
+	一个二次方的鸿沟，“还能不能做得更好”这一根本问题悬而未决。本文正是回答了这一
+	问题。
+	
+	\subsection{主要结果概述}
+	
+	本文的主要结果可非正式地陈述如下（正式定理陈述见第 4 节）：
+	
+	\begin{itemize}
+		\item \textbf{空间下界}：任何单趟 $(\eps, \delta)$-近似 $\Fzero$ 的数据流算法（$\delta$
+		为常数），当 $\eps = \Omega\big(m^{-1/(9+k)}\big)$ 时（$k > 0$ 为任意常数），
+		必须使用 $\Omega(1/\eps^2)$ 位的空间。这把此前该参数范围内的
+		$\Omega(1/\eps)$ 下界提升了整整一个 $1/\eps$ 因子。
+		\item \textbf{紧性}：该下界与当时最优上界几乎匹配——对小 $\eps$ 仅相差
+		$\log\log m$ 因子，对大 $\eps$ 仅相差 $\log(1/\eps)$ 因子。换言之，$\Fzero$
+		估计问题的空间复杂度关于 $\eps$ 的依赖被本文（在相差低阶因子的意义下）
+		最终刻画为 $\Theta(1/\eps^2)$。
+		\item \textbf{技术贡献}：下界通过一条新颖的约化链获得——从欧氏空间中一个布尔
+		promise 问题 $\Pi_{l_2}(t)$（Alice 持单位范数向量 $x$，Bob 持标准基向量 $y$，
+		需区分内积 $\inner{x}{y} = 0$ 与 $\inner{x}{y} = 1/\sqrt{t}$）的单向通信复杂度
+		下界 $\Omega(t)$ 出发，借助 VC 维/shatter coefficient 的信息论工具
+		（Kremer--Nisan--Ron 定理及其推广）建立通信下界，再经由 Indyk 的
+		$l_2 \to l_1$ 低畸变嵌入（stable distributions 方法），通过有理近似、通分放大
+		与一元编码将嵌入后的向量转化为比特串，最终把比特串视为流的特征向量
+		（$\Fzero$ 恰为其 Hamming 重量）完成约化。这一“欧氏问题 $\to$ 嵌入 $\to$
+		汉明空间 $\to$ 数据流”的路线是本文的方法论创新，突破了此前基于集合不交性
+		（set disjointness）的约化只能给出 $\Omega(1/\eps)$ 的瓶颈。
+	\end{itemize}
+	
+	值得注意的是，本文发表后不久，Kane--Nelson--Woodruff（PODS 2010）给出了空间
+	$O(1/\eps^2 + \log m)$ 的最优算法，Woodruff（2004）也直接改进了 Hamming 空间中的
+	下界构造，最终使 $\Fzero$ 估计问题的空间复杂度被完全刻画。本文是这条故事线中
+	确立 $1/\eps^2$ 这一正确量级的主角。
+	
+	\subsection{本 Review 的组织结构}
+	
+	本 Review 其余部分组织如下：
+	
+	\begin{itemize}
+		\item \textbf{第 2 节（问题背景与动机）}：形式化数据流模型与 $\Fzero$ 的
+		$(\eps, \delta)$-近似定义，说明确定性算法的 $\Omega(m)$ 下界，介绍数据库查询
+		优化、网络流量统计与 DoS 攻击检测等应用，并解释研究空间下界的意义。
+		\item \textbf{第 3 节（相关工作）}：沿三条线索梳理文献——$\Fzero$ 估计算法的发展
+		（Flajolet--Martin、Alon--Matias--Szegedy、Bar-Yossef 等人）、本文之前的
+		空间下界（$\Omega(\log m)$ 与 $\Omega(1/\eps)$）、通信复杂性与信息论工具
+		的相关工作，以及本文发表之后的新进展。
+		\item \textbf{第 4 节（论文的技术贡献）}：给出主要定理的正式陈述与参数适用范围，
+		画出证明路线图，解释技术直觉，并与先前 $\Omega(1/\eps)$ 下界技术对比。
+		\item \textbf{第 5 节（技术细节与证明）}：按“定义—引理—证明—备注”的方式完整
+		展开证明链：单向通信复杂性与 Yao 极小极大原则、VC 维与 shatter
+		coefficients、$\Pi_{l_2}(t)$ 的 $\Omega(t)$ 通信下界、$l_2 \to l_1$ 低畸变嵌入、
+		从 $\Pi_{l_2}(t)$ 到 $\Fzero$ 的三步约化，以及主定理的整合。
+		\item \textbf{第 6 节（正确性与优越性分析）}：记录我们对关键步骤的独立复核，
+		分析下界与上界的匹配程度（tightness），讨论遗留 gap 的后续解决。
+		\item \textbf{第 7 节（评价与讨论）}：给出本组对论文创新点、局限性与历史影响的
+		独立评价。
+		\item \textbf{第 8 节（总结）}：浓缩全文，概括问题、技术、结论与总体评价。
+	\end{itemize}
+	
+	\section{问题背景与动机}
+	
+	\subsection{数据流模型}
+	
+	\subsection{Distinct Elements 问题（$\Fzero$ 估计）}
+	
+	\subsection{应用动机}
+	
+	\subsection{为什么研究空间下界}
+	
+	\section{相关工作}
+	
+	本节沿三条线索组织文献：第 3.1 节梳理 $\Fzero$ 估计算法（上界）的发展，第 3.2 节
+	回顾本文之前的空间下界，第 3.3 节介绍本文所用的通信复杂性与嵌入工具的来源，
+	第 3.4 节讨论本文发表之后的新进展。表~\ref{tab:timeline} 给出一个时间线总览。
+	
+	需要说明的是检索渠道：论文自身引用的文献（\cite{FM85, AMS99, BJKST02, BarYossef02,
+		KNR99, BYJKS02, VC71, FLM77, Indyk00, Woo04} 等）以其参考文献表为准；论文未提及的
+	工作——包括 Gibbons--Tirthapura~\cite{GT01}、Durand--Flajolet~\cite{DF03}、
+	HyperLogLog~\cite{HLL07}、Gap-Hamming 下界系列~\cite{JKS08, BC09, CR11}、
+	Kane--Nelson--Woodruff~\cite{KNW10}、Jayram--Woodruff~\cite{JW13}、
+	Błasiok~\cite{Bla18} 等——由本组通过 DBLP 与 Google Scholar 检索定位，并以
+	arXiv 全文及 ACM Digital Library 记录核实其发表年份、会议与主要结论。
+	
+	\begin{table}[htbp]
+		\centering
+		\small
+		\renewcommand{\arraystretch}{1.18}
+		\caption{$\Fzero$ 估计问题的研究时间线（上界、下界与工具三条线索）}
+		\label{tab:timeline}
+		\begin{tabularx}{\textwidth}{@{}c l l >{\raggedright\arraybackslash}X@{}}
+			\toprule
+			年份 & 文献 & 类型 & 主要结果 \\
+			\midrule
+			1985 & Flajolet--Martin~\cite{FM85} & 上界 & 首个概率计数算法，寄存器仅 $O(\log m)$ 位 \\
+			1996/99 & Alon--Matias--Szegedy~\cite{AMS99} & 上界/下界 &
+			频率矩框架；确定性 $\Omega(m)$、随机化 $\Omega(\log m)$ 下界 \\
+			2001 & Gibbons--Tirthapura~\cite{GT01} & 上界 &
+			并流上的 $\Fzero$ 估计，$\tilde{O}(1/\eps^2)$ 空间 \\
+			2002 & Bar-Yossef et al.~\cite{BJKST02} & 上界 &
+			本文之前最优：$O\big((1/\eps^2 \log\log m + \log m \log\frac{1}{\eps})\log\frac{1}{\delta}\big)$ \\
+			2002 & Bar-Yossef~\cite{BarYossef02} & 下界 & 经 $\eps$-set disjointness 得 $\Omega(1/\eps)$ \\
+			1977 & Yao~\cite{Yao77} & 工具 & 极小极大原则：随机下界 $\Leftarrow$ 分布下确定性下界 \\
+			1999 & Kremer--Nisan--Ron~\cite{KNR99} & 工具 & 单向随机通信复杂度 $\geq$ VC 维（相差熵因子） \\
+			2002 & Bar-Yossef et al.~\cite{BYJKS02} & 工具 & shatter coefficient 推广，信息论方法 \\
+			1977 & Figiel et al.~\cite{FLM77} & 工具 & $l_2 \to l_1$ 低畸变嵌入的存在性 \\
+			2000 & Indyk~\cite{Indyk00} & 工具 & stable distributions 草图，$l_p$ 范数流计算 \\
+			\midrule
+			\textbf{2003} & \textbf{Indyk--Woodruff（本文）} & \textbf{下界} &
+			$\eps=\Omega(m^{-1/(9+k)})$ 时 $\Omega(1/\eps^2)$ \\
+			\midrule
+			2003 & Durand--Flajolet~\cite{DF03} & 上界 & LogLog 计数，实用化路线的起点 \\
+			2004 & Woodruff~\cite{Woo04} & 下界 &
+			直接在 Hamming 空间构造，$\Omega(1/\eps^2)$ 适用全参数范围 \\
+			2007 & Flajolet et al.~\cite{HLL07} & 上界 & HyperLogLog，工业界标准基数估计算法 \\
+			2008 & Jayram et al.~\cite{JKS08} & 下界 & 单向 Hamming 距离通信复杂度 $\Omega(n)$ \\
+			2009 & Brody--Chakrabarti~\cite{BC09} & 下界 & Gap-Hamming 多轮通信下界 \\
+			2010 & Kane--Nelson--Woodruff~\cite{KNW10} & 上界 &
+			最优算法：$O(1/\eps^2 + \log m)$（$\delta$ 为常数） \\
+			2011 & Chakrabarti--Regev~\cite{CR11} & 下界 &
+			Gap-Hamming 最优 $\Omega(n)$ 随机通信下界（轮数不限） \\
+			2011/13 & Jayram--Woodruff~\cite{JW13} & 下界 &
+			$\Omega(\eps^{-2}\log(1/\delta))$，刻画 $\delta$ 依赖 \\
+			2018 & Błasiok~\cite{Bla18} & 上界 &
+			$O(\eps^{-2}\log(1/\delta) + \log m)$，三参数均最优 \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+	
+	\subsection{上界：$\Fzero$ 估计算法的发展}
+	
+	$\Fzero$ 估计（数据库界常称基数估计，cardinality estimation）是数据流模型中研究历史
+	最悠久的问题之一。Flajolet 与 Martin~\cite{FM85}（会议版 1983，期刊版 1985）提出了
+	首个概率计数算法：将每个流元素哈希为均匀随机串，用位图记录哈希值二进制表示中
+	最低位 1 的位置分布；由于随机串中低位连续 0 的长度服从几何分布，最大观测值隐含了
+	不同元素个数的量级信息。该算法每个寄存器只需 $O(\log m)$ 位，多开 $R$ 个寄存器可将
+	相对误差压到约 $1/\sqrt{R}$，开创了“用对数级空间换取近似精度”的范式。
+	
+	Alon、Matias 与 Szegedy~\cite{AMS99}（STOC 1996，期刊版 JCSS 1999）系统建立了
+	频率矩（frequency moments）$F_k$ 的流式估计框架。对 $\Fzero$，他们给出基于随机哈希
+	的 $\mathrm{poly}(1/\eps, \log m)$ 空间算法，同时证明了确定性计算或确定性 $(1\pm\eps)$
+	近似 $\Fzero$ 需要 $\Omega(m)$ 空间，从而从根本上确立了随机化近似的必要性；此外他们
+	通过将相等性判定问题 EQ 的单向通信复杂度（$\Theta(\log m)$）约化到 $\Fzero$，得到
+	随机化算法的 $\Omega(\log m)$ 空间下界。这篇论文获 2005 年 Gödel 奖，是数据流算法
+	领域的奠基之作。
+	
+	此后算法沿两个方向改进。Gibbons 与 Tirthapura~\cite{GT01}（SPAA 2001）基于
+	distinct sampling 思想，估计多条流之并上的 $\Fzero$ 等简单函数，空间为
+	$\tilde{O}(1/\eps^2 \cdot \log m)$ 量级。本文发表之前的最优结果属于 Bar-Yossef、Jayram、
+	Kumar、Sivakumar 与 Trevisan~\cite{BJKST02}（RANDOM 2002），其算法空间为
+	\[
+	O\Big(\big(\tfrac{1}{\eps^2}\log\log m + \log m \cdot \log\tfrac{1}{\eps}\big)
+	\log\tfrac{1}{\delta}\Big),
+	\]
+	当 $\delta$ 为常数时主导项是 $1/\eps^2$。正是这个 $1/\eps^2$ 项引出了本文的核心问题：
+	这究竟是算法设计的巧合，还是问题固有的复杂度？
+	
+	\subsection{本文之前的空间下界}
+	
+	与繁荣的上界工作相比，本文之前的下界相当薄弱，只有两条：
+	
+	\paragraph{$\Omega(\log m)$ 下界（AMS~\cite{AMS99}）。}
+	思路是将两人单向通信复杂性的相等性问题 EQ（Alice 与 Bob 各持一个 $m$ 位串，判定是否
+	相等，随机化单向通信复杂度为 $\Theta(\log m)$）约化为 $\Fzero$ 计算：Alice 用自己的串
+	作为流的特征向量喂入 $\Fzero$ 算法，把算法内部状态传给 Bob，Bob 继续喂入自己的串；
+	拼接流的 $\Fzero$ 值即可判定两串是否相等。因此 $\Fzero$ 算法的空间至少为 $\Omega(\log m)$。
+	这个约化建立了“流算法空间 $\geq$ 通信复杂度”的基本范式，本文与后续所有下界工作
+	都沿用这一范式，只是更换了更精细的通信问题。
+	
+	\paragraph{$\Omega(1/\eps)$ 下界（Bar-Yossef 博士论文~\cite{BarYossef02}）。}
+	为了得到依赖 $\eps$ 的下界，Bar-Yossef 使用 $\eps$-set disjointness 问题：Alice 持有
+	$x \subseteq [m]$，$|x| = m/2$；Bob 持有 $y \subseteq [m]$，$|y| = \eps m$；并承诺
+	要么 $y \subseteq x$，要么 $y \cap x = \varnothing$。两种情形下拼接流的 $\Fzero$ 分别为
+	$m/2$ 与 $m/2 + \eps m$，相差恰为相对误差 $\eps$ 可分辨的间隙，故 $(\eps,\delta)$-近似
+	$\Fzero$ 的算法可区分两种情形，继承该通信问题的 $\Omega(1/\eps)$ 单向通信下界。
+	
+	然而这个约化是“弱”的：它并没有用到 $\Fzero$ 算法的全部能力。Alice 完全可以不运行
+	$\Fzero$ 算法，而是随机采样 $O(1/\eps)$ 个全集元素、检查它们是否属于 $x$ 并把结果发给
+	Bob——Bob 据此同样能以高概率判定承诺情形。换言之，$\eps$-set disjointness 本身有一个
+	$O(1/\eps)$ 的直接协议，其通信复杂度上界就是 $O(1/\eps)$，用它做约化源永远不可能导出
+	超过 $\Omega(1/\eps)$ 的下界。要突破 $1/\eps$，必须寻找一个“只有 $\Fzero$ 算法才能高效
+	求解”的 promise 问题——这正是本文选取欧氏空间内积判定问题 $\Pi_{l_2}(t)$ 的动机，
+	详见第 4 节。
+	
+	\subsection{相关的通信复杂性工作}
+	
+	本文证明链所用的工具各有出处，本节简述其来源与在本文中的角色。
+	
+	\paragraph{Yao 极小极大原则~\cite{Yao77}。}
+	Yao（FOCS 1977）的经典结果表明：随机算法在最坏输入上的复杂度下界，等于某输入
+	分布下确定性算法在该分布上的复杂度下界（取所有分布中的最大值）。在本文中，它允许
+	作者把“随机化单向协议的通信下界”转化为“某一精心构造的输入分布 $\mu$ 下确定性协议
+	的分布通信复杂度 $D^{\mu,\delta}$ 的下界”，从而可以使用信息论工具。
+	
+	\paragraph{VC 维与单向通信复杂度（Kremer--Nisan--Ron~\cite{KNR99}）。}
+	VC 维的概念源于 Vapnik 与 Chervonenkis~\cite{VC71}（1971）关于经验过程一致收敛的
+	工作，是学习理论的核心概念。Kremer、Nisan 与 Ron~\cite{KNR99}（Computational
+	Complexity 1999）首次建立其与随机化单向通信复杂度的联系：对任意布尔函数
+	$f: X \times Y \to \{0,1\}$，存在输入分布 $\mu$ 使得
+	$D^{\mu,\delta}(f) \geq \ell(1 - H_2(\delta))$，其中 $\ell$ 是函数族 $f$ 的 VC 维。
+	即“函数族越丰富（VC 维越大），单向通信越贵”。
+	
+	\paragraph{Shatter coefficient 推广（Bar-Yossef et al.~\cite{BYJKS02}）。}
+	当 VC 维难以直接计算时，Bar-Yossef、Jayram、Kumar 与 Sivakumar~\cite{BYJKS02}
+	（CCC 2002）的信息论方法给出更灵活的版本：对任意 $\ell \geq \mathrm{VCD}$，
+	$D^{\mu,\delta}(f) \geq \big(\log \mathrm{SC}(f, \ell) - \ell \cdot H_2(\delta)\big)/2$。
+	本文对 $\Pi_{l_2}(t)$ 的 VC 维没有好办法直接算，正是靠构造一个大小为 $\Theta(t)$、
+	shatter coefficient 接近 $2^{\Theta(t)}$ 的点集应用此定理，才拿到 $\Omega(t)$ 的通信下界
+	（第 5 节详述）。
+	
+	\paragraph{$l_2 \to l_1$ 低畸变嵌入（Figiel et al.~\cite{FLM77}；Indyk~\cite{Indyk00}）。}
+	嵌入定理本身来自 Banach 空间几何：Figiel、Lindenstrauss 与 Milman~\cite{FLM77}
+	（Acta Mathematica 1977）证明了对任意 $\gamma$，存在 $(1+\gamma)$-畸变嵌入
+	$\phi: l_2^t \to l_1^d$，$d = O\big(t \log(1/\gamma) / \gamma^2\big)$。Indyk~\cite{Indyk00}
+	（FOCS 2000，期刊版 JACM 2006）基于 stable distributions（$p$-稳定分布）给出了这类
+	嵌入的显式随机化构造，并开创了其在 $l_p$ 范数数据流计算中的应用；他在 FOCS 2001
+	的特邀报告~\cite{Indyk01} 系统总结了低畸变嵌入的算法应用。本文把这条嵌入链用作
+	“几何问题 $\to$ 汉明空间 $\to$ 数据流”约化中的关键桥梁。
+	
+	\subsection{本文发表之后的新进展}
+	
+	本文发表后，围绕 $\Fzero$ 的上界、下界与应用三条线都迅速推进，最终在 2018 年前后
+	使该问题的空间复杂度在所有参数维度上被完全刻画。
+	
+	\paragraph{下界的完善。}
+	Woodruff~\cite{Woo04}（SODA 2004，即本文参考文献 [11]）放弃了“先嵌入到 $l_1$ 再到
+	Hamming 空间”的间接路线（该路线使维度膨胀多项式因子，导致本文的 $\eps$ 适用范围
+	只有 $\Omega(m^{-1/(9+k)})$），改为直接在 Hamming 空间用精细的概率方法构造向量集，
+	对所有频率矩得到最优空间下界；对 $\Fzero$ 而言这把 $\Omega(1/\eps^2)$ 的适用范围
+	从 $\eps = \Omega(m^{-1/(9+k)})$ 大幅拓宽。
+	
+	本文另一个影响深远的遗产是 Gap-Hamming-Distance（GHD）通信问题——判定两比特串
+	的汉明距离是 $\geq n/2 + \sqrt{n}$ 还是 $\leq n/2 - \sqrt{n}$，由本文正式提出。
+	它迅速成为数据流下界的标准约化源：Jayram、Kumar 与 Sivakumar~\cite{JKS08}（Theory
+	of Computing 2008）证明了其单向版本（Hamming 距离判定）的 $\Omega(n)$ 下界；
+	Brody 与 Chakrabarti~\cite{BC09}（CCC 2009）将其推进到受限多轮协议；
+	Chakrabarti 与 Regev~\cite{CR11}（STOC 2011，期刊版 SICOMP 2012）最终证明了
+	任意轮数随机协议的 $\Omega(n)$ 最优下界，彻底解决了本文留下的猜想。由 GHD 到
+	$\Fzero$ 的约化随即给出适用于全部参数范围、且对多趟扫描也成立的 $\Omega(1/\eps^2)$
+	空间下界。Jayram 与 Woodruff~\cite{JW13}（SODA 2011，期刊版 ACM TALG 2013）
+	进一步把对误差概率 $\delta$ 的依赖也纳入下界，证明 $\Omega(\eps^{-2}\log(1/\delta))$，
+	说明“$\log(1/\delta)$ 倍独立重复”这一朴素做法在渐近意义下不可改进。
+	
+	\paragraph{最优算法的出现。}
+	上界方面，Kane、Nelson 与 Woodruff~\cite{KNW10}（PODS 2010）给出了空间
+	$O(1/\eps^2 + \log m)$ 的算法（$\delta$ 为常数），与本文下界精确匹配，首次证明
+	$\Fzero$ 估计的空间复杂度就是 $\Theta(1/\eps^2 + \log m)$。Błasiok~\cite{Bla18}
+	（SODA 2018，期刊版 ACM TALG 2020）把最优性推广到亚常数误差概率：空间
+	$O(\eps^{-2}\log(1/\delta) + \log m)$，对 $\eps$、$\delta$、$m$ 三个参数同时最优，
+	且支持 strong tracking（整个流过程中持续输出正确估计）。至此，由本文确立
+	$1/\eps^2$ 量级所开启的故事在上界一侧也宣告完结。
+	
+	\paragraph{实用化与变体。}
+	与应用社区并行的是实用算法的演进：Durand 与 Flajolet~\cite{DF03}（ESA 2003）的
+	LogLog 计数与 Flajolet 等人~\cite{HLL07}（AofA 2007）的 HyperLogLog 把 $\Fzero$
+	估计做到每个寄存器仅 $\log\log m$ 位，成为 Redis、Presto 等工业系统中的标准组件；
+	与本文的理论结果对照可以看到，工程界接受的常数因子与模型差异（哈希视为随机预言、
+	插入流）正是理论最优结果允许的空间。此外 Woodruff~\cite{Woo09}（ICDT 2009）证明
+	即使流元素按随机顺序到达（平均情形），$\Fzero$ 估计仍需 $\Omega(1/\eps^2)$ 空间，
+	说明本文的困难性并非来自对抗性顺序的人为假设。2022 年 Chakraborty、Vinodchandran
+	与 Meel~\cite{CVM22}（ESA 2022）提出的 CVM 算法则以极简形式重新实现了最优空间，
+	被称为“可以写进教科书”的算法，可视为这条研究线的教学化终点。
+	
+	\section{论文的技术贡献}
+	
+	\subsection{主要定理}
+	
+	\subsection{证明路线图}
+	
+	\subsection{技术直觉}
+	
+	\subsection{与先前下界技术的对比}
+	
+	\section{技术细节与证明}
+	
+	本节完整展开论文的证明链。记二元熵函数
+	$H_2(p) = -p\log_2 p - (1-p)\log_2(1-p)$；对向量 $v$，$|v|$ 表示其 $l_1$ 范数，
+	$\norm{v}$ 表示其 $l_2$ 范数；对比特串 $x$，$\mathrm{wt}(x)$ 表示其中 1 的个数，
+	$\Delta(x, y)$ 表示 $x$ 与 $y$ 的汉明距离。本节中的定理编号沿用论文原文编号
+	（论文 Theorem 3--6、Corollary 7、Claim 8），以便读者对照原文核验。
+	
+	\subsection{预备知识：单向通信复杂性与 Yao 极小极大原则}
+	
+	\begin{definition}[单向协议与通信复杂度；论文 Definition 1]
+		设 $f: X \times Y \to \{0, 1\}$ 为布尔函数。Alice 持输入 $x \in X$，Bob 持输入
+		$y \in Y$。在\textbf{单向（one-way）协议}中，Alice 计算某个只依赖 $x$ 的消息
+		$A(x)$ 发送给 Bob，Bob 根据 $A(x)$ 与 $y$ 输出对 $f(x, y)$ 的猜测。协议 $\Pi$ 的
+		\textbf{通信代价}是所有输入上 Alice 发送的最长消息的期望长度。$f$ 的
+		\textbf{$\delta$-误差随机化（单向）通信复杂度} $R^{\delta}(f)$ 是在所有输入上满足
+		$\Pr[\Pi(x,y) \neq f(x,y)] \leq \delta$ 的最优协议的通信代价。对输入分布 $\mu$，
+		$f$ 的 \textbf{$\delta$-误差 $\mu$-分布通信复杂度} $D^{\mu,\delta}(f)$ 是在 $\mu$ 下
+		误差不超过 $\delta$ 的最优\textbf{确定性}协议的通信代价。
+	\end{definition}
+	
+	\begin{theorem}[Yao 极小极大原则~\cite{Yao77}]
+		对任意布尔函数 $f$、误差 $\delta$ 与任意输入分布 $\mu$，
+		$R^{\delta}(f) \geq D^{\mu,\delta}(f)$。
+	\end{theorem}
+	
+	\begin{remark}[为什么这条原则对本文至关重要]
+		随机化协议可以看作确定性协议分布上的一个随机变量：若每个确定性协议在某分布 $\mu$
+		下都要付出高昂通信代价才能取得低误差，那么随机化协议（确定性协议的混合）在 $\mu$ 的
+		某个输入上也不可能做得更好。因此，要证明\textbf{随机化}单向协议的下界，只需
+		\textbf{自由地设计一个难处理的输入分布 $\mu$}，然后分析\textbf{确定性}协议在该分布下
+		的表现——后者可以用信息论工具精确刻画。本文第 5.3 节正是沿此路线：先构造分布
+		（通过 shatter coefficient 间接给出），再推出 $D^{\mu,\delta} = \Omega(t)$。
+	\end{remark}
+	
+	\begin{remark}[从通信下界到流算法空间下界]
+		这是 AMS~\cite{AMS99} 确立的标准范式：设 $\mathcal{A}$ 是空间为 $S$ 的单趟
+		$(\eps, \delta)$-近似 $\Fzero$ 算法。Alice 把自己的输入编码为一段流，在本地运行
+		$\mathcal{A}$ 后把\textbf{算法的全部内部状态}（至多 $S$ 位）发给 Bob；Bob 把状态载入
+		自己的 $\mathcal{A}$ 副本，继续处理自己输入对应的流段。若拼接流的 $\Fzero$ 值能区分
+		通信问题的两种承诺情形，则 $S \geq R^{\delta}(f)$。整条证明链的最终一环（第 5.5 节）
+		就是这个范式的一次精细实例化。
+	\end{remark}
+	
+	\subsection{VC 维与 Shatter Coefficients}
+	
+	\begin{definition}[Shatter coefficient 与 VC 维；论文 Definition 2]
+		设 $\mathcal{F} = \{f: X \to \{0,1\}\}$ 是域 $X$ 上的布尔函数族。对子集
+		$S \subseteq X$，其 \textbf{shatter coefficient} 为
+		$\mathrm{SC}(\mathcal{F}|_S) = |\{f|_S\}_{f \in \mathcal{F}}|$，即把 $\mathcal{F}$ 中函数
+		限制到 $S$ 上所能得到的不同比特模式数。第 $\ell$ 个 shatter coefficient
+		$\mathrm{SC}(\mathcal{F}, \ell)$ 是所有大小为 $\ell$ 的子集上该数量的最大值。若
+		$\mathrm{SC}(\mathcal{F}|_S) = 2^{|S|}$，称 $S$ 被 $\mathcal{F}$ \textbf{打散}
+		（shattered）；$\mathcal{F}$ 的 \textbf{VC 维} $\mathrm{VCD}(\mathcal{F})$ 是能被打散的
+		最大子集的大小。
+	\end{definition}
+	
+	\begin{theorem}[Kremer--Nisan--Ron~\cite{KNR99}；论文 Theorem 3]
+		对任意 $f: X \times Y \to \{0,1\}$ 与任意 $0 < \delta < 1$，存在 $X \times Y$ 上的
+		分布 $\mu$ 使得
+		\[
+		D^{\mu,\delta}(f) \geq \ell\,(1 - H_2(\delta)),
+		\qquad \ell = \mathrm{VCD}(f_X),
+		\]
+		其中 $f_X = \{f_x: Y \to \{0,1\} \mid x \in X\}$，$f_x(y) = f(x,y)$。
+	\end{theorem}
+	
+	\begin{theorem}[Bar-Yossef et al.~\cite{BYJKS02}；论文 Theorem 4]
+		对任意 $f: X \times Y \to \{0,1\}$、任意 $\ell \geq \mathrm{VCD}(f_X)$ 与任意
+		$\delta > 0$，存在分布 $\mu$ 使得
+		\[
+		D^{\mu,\delta}(f) \geq \frac{\log \mathrm{SC}(f_X, \ell) - \ell \cdot H_2(\delta)}{2}.
+		\]
+	\end{theorem}
+	
+	\begin{remark}[工具的角色]
+		直觉是：单向协议中 Bob 只能依靠 Alice 的消息区分不同的 $x$；若函数族 $f_X$ 在某个
+		大小为 $\ell$ 的 $y$-集合上能产生 $2^{\Omega(\ell)}$ 种不同的真值模式，那么 Alice 的
+		消息必须编码 $\Omega(\ell)$ 位信息才能让 Bob 以低误差输出正确模式——熵因子
+		$H_2(\delta)$ 是允许 $\delta$ 误差带来的折扣。论文 Theorem 3 要求算出 VC 维，而本文
+		面对的函数族（欧氏内积判定）VC 维难以直接计算；Theorem 4 允许用任意
+		$\ell \geq \mathrm{VCD}$ 配上 shatter coefficient 的下界，只要构造出“模式足够多”的
+		点集即可，这正是第 5.3 节的打法。
+	\end{remark}
+	
+	\subsection{$\Pi_{l_2}(t)$ 问题的单向通信复杂度下界}
+	
+	固定 $\eps$，令 $t = t(\eps) = \Theta(1/\eps^2)$（不妨设 $t$ 为 2 的幂）。
+	
+	\begin{definition}[$\Pi_{l_2}(t)$；论文第 3.1 节]
+		令 $E = \{e_1, \dots, e_t\}$ 为 $\R^t$ 的标准基。先定义
+		\[
+		\Pi'_{l_2}(t) = \big\{(x, y) \in [0,1]^t \times E \;\big|\; \norm{x} = 1,\;
+		\inner{x}{y} = 0 \ \text{或}\ \inner{x}{y} = 2/\sqrt{t}\,\big\}.
+		\]
+		为使坐标可被有限描述且能赋予概率分布，将有理数 $p/q$ 的\textbf{尺寸}定义为
+		$\lceil \log_2 p \rceil + \lceil \log_2 q \rceil + 1$，并设 $B = \lceil 2\log t \rceil$。定义
+		\[
+		\Pi_{l_2}(t) = \big\{(x, y) \in \Pi'_{l_2}(t) \;\big|\; \forall i,\;
+		x_i, y_i \text{ 为尺寸} \leq B \text{ 的有理数}\big\}.
+		\]
+		令 $X$、$Y$ 分别为可出现于合法输入对中的 $x$、$y$ 之集合。对
+		$(x,y) \in \Pi_{l_2}(t)$，定义 $f(x,y) = 0$ 若 $\inner{x}{y} = 0$，$f(x,y) = 1$ 若
+		$\inner{x}{y} = 2/\sqrt{t}$。函数族为
+		$\mathcal{F} = f_X = \{f_x: Y \to \{0,1\} \mid x \in X\}$。
+	\end{definition}
+	
+	\begin{lemma}[内积间隙 $\Rightarrow$ 距离间隙；论文第 3.1 节末]
+		对 $(x,y) \in \Pi_{l_2}(t)$：
+		\[
+		f(x,y) = 0 \;\Rightarrow\; \norm{y - x} = \sqrt{2},
+		\qquad
+		f(x,y) = 1 \;\Rightarrow\; \norm{y - x} < \sqrt{2}\,\Big(1 - \frac{1}{\sqrt{t}}\Big).
+		\]
+	\end{lemma}
+	
+	\begin{proof}
+		由 $\norm{y-x}^2 = \norm{y}^2 + \norm{x}^2 - 2\inner{x}{y}$ 及
+		$\norm{x} = \norm{y} = 1$：当 $f(x,y) = 0$ 时 $\norm{y-x}^2 = 2$；当 $f(x,y) = 1$ 时
+		$\norm{y-x}^2 = 2 - 4/\sqrt{t}$，于是
+		$\norm{y-x} = \sqrt{2}\sqrt{1 - 2/\sqrt{t}} < \sqrt{2}(1 - 1/\sqrt{t})$，
+		最后一步用到 $\sqrt{1-u} < 1 - u/2$（$0 < u < 1$）。
+	\end{proof}
+	
+	这条引理是整条约化的支点：\textbf{内积的 $2/\sqrt{t}$ 间隙被转化为 $l_2$ 距离的
+		$(1 - 1/\sqrt{t})$ 相对间隙}，而距离（而非内积）才能经嵌入与编码一路传递到 $\Fzero$。
+	
+	\begin{theorem}[论文 Theorem 6]
+		$\mathcal{F}$ 的第 $t/4$ 个 shatter coefficient 满足
+		$\mathrm{SC}(\mathcal{F}, t/4) \geq 2^{H_2(1/4)\,t}$（渐进意义下）。
+	\end{theorem}
+	
+	\begin{proof}
+		对任意 $T = \{e_{i_1}, \dots, e_{i_{t/4}}\} \subseteq Y$（$|T| = t/4$），定义
+		\[
+		x_T = \frac{2}{\sqrt{t}} \sum_{e \in T} e .
+		\]
+		验证合法性：$\norm{x_T}^2 = (4/t)\cdot(t/4) = 1$；$x_T$ 的每个坐标为 $0$ 或
+		$2/\sqrt{t}$，因 $t$ 是 2 的幂，$2/\sqrt{t}$ 是尺寸 $\leq B = \lceil 2\log t\rceil$ 的
+		有理数，故 $x_T \in X$。令 $X_1 = \{x_T \mid T \subseteq Y,\ |T| = t/4\}$。
+		
+		考察任意一个恰含 $t/4$ 个 1 的长度-$t$ 比特串，设其 1 位于 $i_1, \dots, i_{t/4}$，取
+		$T = \{e_{i_1}, \dots, e_{i_{t/4}}\}$。则对 $e \in T$：
+		$\inner{x_T}{e} = \inner{\frac{2}{\sqrt{t}}\sum_{e' \in T} e'}{e} = \frac{2}{\sqrt{t}}$，
+		故 $f_{x_T}(e) = 1$；对 $e \notin T$：$x_T$ 与 $e$ 正交，$\inner{x_T}{e} = 0$，故
+		$f_{x_T}(e) = 0$。于是\textbf{每一个}重量为 $t/4$ 的比特串都作为某个 $f_{x_T}$ 在
+		$Y$ 上的真值表出现。这类比特串共有
+		$\binom{t}{t/4} \approx 2^{H_2(1/4)\,t}$ 个（由 Stirling 公式），故
+		$\mathrm{SC}(\mathcal{F}, t/4) \geq 2^{H_2(1/4)\,t}$。
+	\end{proof}
+	
+	\begin{corollary}[论文 Corollary 7]
+		对一切常数 $\delta < 1/4$，$R^{\delta}(f) = \Omega(t)$。
+	\end{corollary}
+	
+	\begin{proof}
+		由于 $|Y| = t$，对任何 $X_1 \subseteq X$ 都有 $\mathrm{VCD}(f_{X_1}) \leq t$，因此可在
+		论文 Theorem 4 中取 $\ell = t$：存在分布 $\mu$ 使得
+		\[
+		D^{\mu,\delta}(f) \geq
+		\frac{\log \mathrm{SC}(f_{X_1}, t) - t\,H_2(\delta)}{2}
+		\;\approx\; \frac{t\big(H_2(1/4) - H_2(\delta)\big)}{2} \;=\; \Omega(t),
+		\]
+		其中用到 $\mathrm{SC}(f_{X_1}, t) \geq \mathrm{SC}(\mathcal{F}, t/4) \geq
+		2^{H_2(1/4)\,t}$（重量-$t/4$ 串是全真值表的一部分），以及 $\delta < 1/4$ 时
+		$H_2(\delta) < H_2(1/4)$ 使括号内为正常数。再由 Yao 极小极大原则，
+		$R^{\delta}(f) \geq D^{\mu,\delta}(f) = \Omega(t)$。
+	\end{proof}
+	
+	\begin{remark}
+		这是全文最技术性的一步，但核心想法很朴素：$x_T$ 是“指示向量的归一化”，内积判定
+		恰好读出基向量是否属于 $T$，于是 $\Pi_{l_2}(t)$ 的函数族\textbf{包含了所有重量-$t/4$
+			的指示函数}——其丰富程度（$\approx 2^{0.811 t}$ 种模式）迫使 Alice 必须传送
+		$\Omega(t)$ 位。注意与 $\eps$-set disjointness 的对比：那里的函数族贫瘠到采样协议就能
+		应付，而这里的函数族丰富到通信复杂度达到输入尺寸的量级，这正是新下界能突破
+		$1/\eps$ 的根本原因。
+	\end{remark}
+	
+	\subsection{$l_2 \to l_1$ 低畸变嵌入}
+	
+	\begin{definition}[低畸变嵌入]
+		映射 $\phi: l_r^t \to l_s^d$ 称为 \textbf{$(1+\gamma)$-畸变嵌入}，若对任意
+		$p, q \in l_r^t$：
+		\[
+		\frac{1}{1+\gamma}\,\norm{p - q}_r \leq \norm{\phi(p) - \phi(q)}_s \leq \norm{p - q}_r .
+		\]
+	\end{definition}
+	
+	\begin{theorem}[Figiel--Lindenstrauss--Milman~\cite{FLM77}；论文 Theorem 5]
+		对任意 $\gamma > 0$，存在 $(1+\gamma)$-畸变嵌入 $\phi: l_2^t \to l_1^d$，其中
+		$d = O\big(t \log(1/\gamma) / \gamma^2\big)$。Indyk~\cite{Indyk00} 基于 $p$-稳定分布
+		给出了此类嵌入的显式随机化构造。
+	\end{theorem}
+	
+	\begin{remark}[为什么约化需要它]
+		$\Pi_{l_2}(t)$ 的间隙存在于 $l_2$ 距离中，而 $\Fzero$ 是汉明重量（本质是 $l_1$/计数
+		量）。从 $l_2$ 到比特串没有保距的直接通道，但 $l_1$ 有：把坐标放大为整数后做一元
+		编码，$l_1$ 距离恰好变成汉明距离（见第 5.5 节）。嵌入 $\phi$ 就是中间的桥。由于
+		$\phi$ 是\textbf{确定性的}且 Alice 与 Bob 都知道，双方可以各自在本地计算 $\phi(x)$、
+		$\phi(y)$，不消耗任何通信。畸变参数 $\gamma$ 最终取 $\Theta(\eps)$：要足够小以使
+		$(1+\gamma)$ 的伸缩不淹没 $1/\sqrt{t} = \eps$ 的间隙，但 $\gamma$ 越小目标维度 $d$
+		越大，直接决定最终全集大小 $m$——这就是参数范围 $m^{-1/9}$ 的来源（第 5.6 节）。
+	\end{remark}
+	
+	设 $\gamma = \gamma(t)$ 待定。取定理中的嵌入 $\phi: l_2^t \to l_1^d$。对
+	$(x, y) \in \Pi_{l_2}(t)$，Alice 计算 $\phi(x)$、Bob 计算 $\phi(y)$。由畸变性质
+	（取 $q = 0$ 得范数关系，取一般 $p, q$ 得距离关系）：
+	\begin{align}
+		\frac{1}{1+\gamma} \;\leq\; &|\phi(x)|,\ |\phi(y)| \;\leq\; 1, \tag{1}\\
+		\frac{\norm{y - x}}{1+\gamma} \;\leq\; &|\phi(y) - \phi(x)| \;\leq\; \norm{y - x}. \tag{2}
+	\end{align}
+	
+	\subsection{从 $\Pi_{l_2}(t)$ 到 $\Fzero$ 的约化}
+	
+	约化分三步：有理近似 $\to$ 通分放大为整数 $\to$ 一元编码为比特串，最后把比特串
+	当作流的特征向量。
+	
+	\paragraph{第一步：有理近似。}
+	取待定参数 $z = z(t) \in \mathbb{N}$。对实数 $r$，记 $\{r\}$ 为其小数部分；存在唯一
+	整数 $s \in [0, z)$ 使 $0 \leq \{r\} - s/z \leq 1/z$，定义
+	$\psi(r) = (r - \{r\}) + s/z$。对向量逐坐标作用 $\psi$。每个坐标改动至多 $1/z$，
+	$d$ 个坐标的 $l_1$ 范数总误差至多 $d/z$：
+	\begin{align}
+		|\phi(x)| - \tfrac{d}{z} \;\leq\; &|\psi(\phi(x))| \;\leq\; |\phi(x)| + \tfrac{d}{z}, \tag{3}\\
+		|\phi(y)| - \tfrac{d}{z} \;\leq\; &|\psi(\phi(y))| \;\leq\; |\phi(y)| + \tfrac{d}{z}, \tag{4}\\
+		|\phi(y) - \phi(x)| - \tfrac{d}{z} \;\leq\; &|\psi(\phi(y)) - \psi(\phi(x))|
+		\;\leq\; |\phi(y) - \phi(x)| + \tfrac{d}{z}. \tag{5,6}
+	\end{align}
+	
+	\paragraph{第二步：通分放大为整数。}
+	将每个坐标乘以公分母 $z$：记 $s(v) = (z v_1, \dots, z v_d)$，则
+	$s(\psi(\phi(x)))$、$s(\psi(\phi(y)))$ 的所有坐标都是整数，范数同步放大 $z$ 倍。
+	由 (1)、(3) 知 $|\psi(\phi(x))| \leq 1 + d/z \leq 2$（将保证 $d = o(z)$），故每个整数
+	坐标的绝对值 $\leq 2z$。
+	
+	\paragraph{第三步：一元编码为比特串。}
+	对整数 $i \in [-2z, 2z]$，定义其一元编码为长 $4z$ 的比特串
+	$u(i) = 1^{\,i + 2z}\,0^{\,2z - i}$（前 $2z + i$ 位为 1）。对向量逐坐标编码并拼接：
+	$x' = u(s(\psi(\phi(x))))$，$y' = u(s(\psi(\phi(y))))$，长度均为 $\Theta(zd)$
+	（论文记为 $(4z+1)d$）。一元编码的关键性质：
+	\[
+	|v_1 - v_2| \;=\; \Delta\big(u(v_1), u(v_2)\big),
+	\qquad\text{且}\qquad
+	\mathrm{wt}(x') = |s(\psi(\phi(x)))|,
+	\]
+	即 \textbf{$l_1$ 距离与汉明距离严格相等，$l_1$ 范数与汉明重量严格相等}——放大的 $z$
+	倍同时出现在两边。由 (1)(3)(4) 得重量界：
+	\[
+	z\Big(\frac{1}{1+\gamma} - \frac{d}{z}\Big) \;\leq\; \mathrm{wt}(x'),\ \mathrm{wt}(y')
+	\;\leq\; z\Big(1 + \frac{d}{z}\Big);
+	\]
+	由 (2)(5)(6) 得距离界：
+	\[
+	\frac{z\norm{y-x}}{1+\gamma} - d \;\leq\; \Delta(x', y') \;\leq\; z\norm{y-x} + d. \tag{7}
+	\]
+	
+	\paragraph{第四步：把比特串变成流。}
+	把 $x'$、$y'$ 看作全集 $[m]$（$m = \Theta(zd)$）上两条流 $a_{x'}$、$a_{y'}$ 的
+	特征向量，则拼接流 $a_{x'} \circ a_{y'}$ 的特征向量是按位或 $x' \vee y'$，故
+	$\Fzero(a_{x'} \circ a_{y'}) = \mathrm{wt}(x' \vee y')$。
+	
+	\begin{lemma}[论文 Claim 8]
+		设 $\beta_1(z) \leq \mathrm{wt}(x'), \mathrm{wt}(y') \leq \beta_2(z)$，则
+		\[
+		\beta_1(z) + \frac{\Delta(x', y')}{2} \;\leq\; \Fzero(a_{x'} \circ a_{y'})
+		\;\leq\; \beta_2(z) + \frac{\Delta(x', y')}{2}.
+		\]
+	\end{lemma}
+	
+	\begin{proof}
+		设 $c$ 为“$y'$ 为 1 而 $x'$ 为 0”的坐标数。逐位计数得
+		$\Delta(x', y') = \mathrm{wt}(x') - \mathrm{wt}(y') + 2c$，即
+		$c = \frac{1}{2}\big(\Delta(x',y') + \mathrm{wt}(y') - \mathrm{wt}(x')\big)$。于是
+		\[
+		\mathrm{wt}(x' \vee y') = \mathrm{wt}(x') + c
+		= \frac{1}{2}\big(\Delta(x', y') + \mathrm{wt}(x') + \mathrm{wt}(y')\big),
+		\]
+		代入 $\mathrm{wt}$ 的上下界即得。
+	\end{proof}
+	
+	\paragraph{两种承诺情形的 $\Fzero$ 间隙。}
+	\textbf{情形 $f(x,y) = 0$}：此时 $\norm{x - y} = \sqrt{2}$。由 (7) 的下端与引理
+	（取 $\beta_1 = z\big(\frac{1}{1+\gamma} - \frac{d}{z}\big)$）：
+	\[
+	\Fzero \;\geq\; -\frac{3d}{2} + \frac{z}{1+\gamma} + \frac{z\sqrt{2}}{2+2\gamma}
+	\;=\; -\frac{3d}{2} + \frac{z\big(1 + \frac{1}{\sqrt{2}}\big)}{1+\gamma}.
+	\]
+	\textbf{情形 $f(x,y) = 1$}：此时 $\norm{x-y} < \sqrt{2}\big(1 - \frac{1}{\sqrt{t}}\big)$。
+	由 (7) 的上端与引理（取 $\beta_2 = z\big(1 + \frac{d}{z}\big)$）：
+	\[
+	\Fzero \;\leq\; \frac{3d}{2} + z\Big(1 + \frac{1}{\sqrt{2}}\Big)
+	- \frac{z}{\sqrt{2t}}.
+	\]
+	两情形的主项同为 $z(1 + 1/\sqrt{2})$，而间隙为 $\frac{z}{\sqrt{2t}} = \frac{\eps z}{\sqrt{2}}$
+	（量级 $\eps z$），恰为主项的 $\Theta(\eps)$ 相对间隙；扰动项是 $\pm 3d/2$ 与
+	$(1+\gamma)$ 因子。取 $\eps' = c\eps$（$c = \frac{1}{3(\sqrt{2}+1)}$ 为小常数），一个
+	$(\eps', \delta)$-近似 $\Fzero$ 的算法能区分两情形，当且仅当
+	\[
+	(1+\eps')\Big(\frac{3d}{2} + z\Big(1+\frac{1}{\sqrt{2}}\Big) - \frac{\eps z}{\sqrt{2}}\Big)
+	\;<\; (1-\eps')\Big(-\frac{3d}{2} + \frac{z\big(1+\frac{1}{\sqrt{2}}\big)}{1+\gamma}\Big).
+	\tag{8}
+	\]
+	
+	\paragraph{参数求解。}
+	若 $d = o(z\eps)$，含 $d$ 的项被吸收，(8) 在 $\eps$ 充分小（常数）时等价于
+	\[
+	(1+\eps')\Big(z\Big(1+\frac{1}{\sqrt{2}}\Big) - \frac{\eps z}{\sqrt{2}}\Big)
+	\;<\; \frac{(1-\eps')\,z\big(1+\frac{1}{\sqrt{2}}\big)}{1+\gamma}.
+	\]
+	取 $c = \frac{1}{3(\sqrt{2}+1)}$，经代数整理可知 $\gamma = \Theta(\eps)$ 即可使不等式
+	成立。回代各参数：
+	\[
+	\gamma = \Theta(\eps)
+	\;\Rightarrow\;
+	d = O\Big(\frac{t\log(1/\gamma)}{\gamma^2}\Big) = O\Big(\frac{1}{\eps^4}\log\frac{1}{\eps}\Big)
+	\;\Rightarrow\;
+	z = \omega\Big(\frac{1}{\eps^5}\log\frac{1}{\eps}\Big)
+	\;\Rightarrow\;
+	m = \Theta(zd) = \omega\Big(\frac{1}{\eps^9}\log\frac{1}{\eps}\Big).
+	\]
+	于是在全集大小 $m = \Theta\big(\eps^{-9}\log(1/\eps)\big)$ 上，$(\Theta(\eps), \delta)$
+	近似 $\Fzero$ 的算法可以 $\delta$ 误差判定 $\Pi_{l_2}(t)$，由约化其空间必为
+	$\Omega(t) = \Omega(1/\eps^2)$。
+	
+	\begin{remark}[约化的正确性要点]
+		整条链上信息只经历三次“损耗”：嵌入畸变 $(1+\gamma)$、有理近似误差 $d/z$、
+		$\Fzero$ 估计误差 $\eps'$。三者都被控制在间隙 $\eps z$ 之下（分别为
+		$\gamma = \Theta(\eps)$、$d = o(z\eps)$、$\eps' = \eps/3(\sqrt{2}+1)$），因此两种
+		承诺情形在估计值上仍然可分。Alice 发送的是 $\Fzero$ 算法处理 $a_{x'}$ 后的内部状态，
+		Bob 续跑 $a_{y'}$ 后读出答案——通信量恰为算法空间，故空间 $\geq R^{\delta}(f) =
+		\Omega(t)$。
+	\end{remark}
+	
+	\subsection{主定理的整合与参数范围}
+	
+	\begin{theorem}[主定理（论文摘要与第 4 节）]
+		设 $\delta < 1/4$ 为常数，$k > 0$ 为任意常数。任何在大小为 $m$ 的全集上单趟
+		$(\eps, \delta)$-近似 $\Fzero$ 的数据流算法，当
+		\[
+		\eps = \Omega\big(m^{-1/(9+k)}\big)
+		\]
+		时必须使用 $\Omega(1/\eps^2)$ 位空间；对所有更小的 $\eps$，空间下界为
+		$\Omega(m^{2/9})$ 量级。
+	\end{theorem}
+	
+	\begin{proof}[证明链汇总]
+		(1) 固定 $\eps$，设 $t = \Theta(1/\eps^2)$。由论文 Corollary 7，
+		$\Pi_{l_2}(t)$ 的判定需要 $R^{\delta}(f) = \Omega(t)$ 的单向通信。
+		(2) 由第 5.5 节的约化，一个空间为 $S$ 的单趟 $(\Theta(\eps), \delta)$-近似 $\Fzero$
+		算法给出 $\Pi_{l_2}(t)$ 的 $S$ 位单向协议：Alice 将 $x$ 经
+		“嵌入 $\to$ 有理近似 $\to$ 放大 $\to$ 一元编码”变为流 $a_{x'}$，运行 $\Fzero$ 算法并
+		发送其状态；Bob 对 $y$ 做同样变换得到 $a_{y'}$，续跑算法并以输出是否超过阈值
+		$\approx z(1 + 1/\sqrt{2}) - \frac{1}{2}\cdot\frac{\eps z}{\sqrt{2}}$ 判定 $f(x,y)$。
+		两种情形的 $\Fzero$ 间隙为主项的 $\Theta(\eps)$，而估计误差为 $\Theta(\eps) <
+		\eps/\sqrt{2}$（相对主项），故判定误差 $\leq \delta$。
+		(3) 因此 $S = \Omega(t) = \Omega(1/\eps^2)$。约化产生的全集大小为
+		$m = \Theta\big(\eps^{-9}\log(1/\eps)\big)$，反解得
+		$\eps = \Theta\big((\log m / m)^{1/9}\big)$，即对任意 $k > 0$，当
+		$\eps = \Omega(m^{-1/(9+k)})$ 时下界成立。
+		(4) 对更小的 $\eps$，取 $\eps_0 = \Theta(m^{-1/9})$ 应用上述构造（此时约化在同样大小
+		的全集上给出 $\Omega(1/\eps_0^2) = \Omega(m^{2/9})$ 的下界；对 $\eps < \eps_0$ 的
+		$(\eps,\delta)$-近似同样是 $(\eps_0, \delta)$-近似），即得对所有更小 $\eps$ 的
+		$\Omega(m^{2/9})$ 空间下界。
+	\end{proof}
+	
+	\begin{remark}[参数范围与 tightness]
+		范围限制 $\eps = \Omega(m^{-1/(9+k)})$ 完全来自嵌入的维度膨胀：确定性嵌入
+		$d = O(t\log(1/\gamma)/\gamma^2)$ 带来 $\eps^{-4}$，有理近似的精度要求
+		$d = o(z\eps)$ 再贡献 $\eps^{-5}$，合计 $m \approx \eps^{-9}$。论文在第 4 节指出两条
+		松动途径：改用\textbf{随机化}嵌入可将 $d$ 降至 $O(\log t / \gamma^2)$；而
+		Woodruff~\cite{Woo04} 随后直接在 Hamming 空间构造向量集，把 $1/\eps$ 的上界推进到
+		最优的 $m^{1/2}$。就 tightness 而言：本文下界 $\Omega(1/\eps^2)$ 与当时最优上界
+		$O\big((1/\eps^2 \log\log m + \log m \log(1/\eps))\log(1/\delta)\big)$~\cite{BJKST02}
+		相比，小 $\eps$ 时相差 $\log\log m$、大 $\eps$ 时相差 $\log(1/\eps)$——关于 $\eps$ 的
+		依赖已被完全钉死，剩余的只是 $m$ 与 $\delta$ 方向上的低阶因子（分别由
+		\cite{KNW10} 与 \cite{JW13, Bla18} 在后续工作中消除）。
+	\end{remark}
+	
+	\section{正确性与优越性分析}
+	
+	\subsection{证明正确性的检验}
+	
+	\subsection{紧性分析：下界与上界的匹配程度}
+	
+	\subsection{遗留问题及其后续解决}
+	
+	\section{评价与讨论}
+	
+	本节给出本组对论文的独立评价：第 7.1 节讨论其非凡之处，第 7.2 节提出局限与
+	批评，第 7.3 节分析其对后续研究的影响。
+	
+	\subsection{论文的非凡之处}
+	
+	\paragraph{1. 问对了问题，并且答得干净利落。}
+	2002 年前后，$\Fzero$ 估计的上界停滞在 $\tilde{O}(1/\eps^2)$，下界停滞在
+	$\Omega(1/\eps)$，“二次方鸿沟”是整个数据流社区公开的尴尬。本文没有在上界侧继续
+	堆砌技巧，而是直接回答“$1/\eps^2$ 是不是问题固有的”这一根本问题，并给出肯定答案。
+	事后看，这个答案一次性地终结了算法设计上“继续优化 $1/\eps$ 依赖”的所有幻想——
+	好的下界和好的算法一样能推动领域前进，本文是这一点的教科书式例证。
+	
+	\paragraph{2. 方法论上的真正创新：给数据流下界装上了“信息论 + 几何”的引擎。}
+	此前流式下界的约化源都是组合式通信问题（EQ、set disjointness），它们的通信复杂度
+	自带容易达到的协议上界，天花板分别是 $\log m$ 和 $1/\eps$。本文的关键洞察是：
+	\emph{要突破天花板，必须换一个“只有 $\Fzero$ 算法的全部能力才能解”的 promise 问题}。
+	欧氏空间中的内积判定 $\Pi_{l_2}(t)$ 恰好满足这一点——它的函数族包含全部
+	重量-$t/4$ 的指示函数，丰富到任何协议（包括采样协议）都必须传 $\Omega(t)$ 位。
+	为把这种几何问题的复杂度“搬运”到汉明空间，论文串联起 VC 维/shatter coefficient
+	的信息论工具与 $l_2 \to l_1$ 低畸变嵌入这两套此前很少在流式下界中同框出现的
+	machinery，开创了“几何 promise 问题 $\to$ 嵌入 $\to$ 汉明空间 $\to$ 流”的证明范式。
+	这条流水线此后被反复复用，成为数据流下界证明的标准工艺之一。
+	
+	\paragraph{3. 一个副产品比主定理还要长寿：Gap-Hamming 问题。}
+	本文正式提出的 Gap-Hamming-Distance 问题（判定两比特串汉明距离
+	$\geq n/2+\sqrt{n}$ 还是 $\leq n/2-\sqrt{n}$）在随后十年成为理论计算机科学中最
+	高产的通信问题之一：它的多轮下界~\cite{BC09}、最优下界~\cite{CR11} 牵动了
+	round elimination、高斯空间相关性、信息复杂度等多个方向的工具发展，其影响早已
+	溢出 $\Fzero$ 本身，渗透到频率矩、熵估计、图流等一大批问题的下界证明中。一篇
+	6 页的会议论文同时贡献了一个紧下界和一个“下界制造机”，这在文献中并不多见。
+	
+	\paragraph{4. 工具皆为成熟成品，组合方式却出人意料。}
+	Yao 原则（1977）、VC 维（1971）、KNR 定理（1999）、FLM 嵌入（1977）、一元
+	编码——链条上没有任何一个零件是新的，但整台机器是新的。这体现了作者对两个
+	领域（通信复杂性与度量嵌入）工具箱的同时精通，也使得证明在技术上异常扎实：
+	每一步都可以引用现成的强定理，审稿时没有薄弱环节。对我们学习者而言，这是
+	“创新可以来自跨界组合而非单点突破”的极佳示范。
+	
+	\subsection{局限与批评}
+	
+	\paragraph{1. 参数范围不够紧致，留下了 $m^{-1/9}$ 与 $m^{-1/2}$ 之间的 gap。}
+	本文下界仅在 $\eps = \Omega(m^{-1/(9+k)})$ 时给出 $\Omega(1/\eps^2)$；对更小（更高
+	精度要求）的 $\eps$，只剩 $\Omega(m^{2/9})$ 的平庸下界，与上界 $\tilde{O}(1/\eps^2)$
+	相去甚远。根源是技术性的：确定性嵌入带来 $d = O(\eps^{-4}\log(1/\eps))$ 的维度
+	膨胀，有理近似的精度要求再放大出 $\eps^{-5}$。作者自己在结论中也承认可用随机化
+	嵌入松动该界，而最终由 Woodruff~\cite{Woo04} 直接构造解决——这说明本文的
+	$1/9$ 指数并非问题的本质，而是约化路线的“过路费”。换言之，主定理的\emph{结论}
+	是紧的，但其\emph{证明}并非最经济的。
+	
+	\paragraph{2. 模型覆盖面窄。}
+	下界只针对\textbf{单趟、纯插入}（insertion-only）流：不覆盖多趟扫描（尽管后来的
+	GHD 最优下界~\cite{CR11} 顺带解决了这一点）、不允许元素删除（turnstile 模型）、
+	不涉及滑动窗口；同时只约束\textbf{空间}，对更新时间、哈希函数的随机性代价
+	（实际实现中“真随机哈希”并不存在）均不置一词。此外 $\delta$ 被固定为常数，
+	亚常数误差概率下 $\log(1/\delta)$ 因子是否必要，留给了 Jayram--Woodruff~\cite{JW13}。
+	这些留白今天看都已被后续工作填补，但读者需意识到本文结论的适用边界。
+	
+	\paragraph{3. 行文密度过高，存在若干伤读者的小瑕疵。}
+	全文仅 6 页，大量代数推导被压缩为“after some algebra”；常数 $c$、$\eps_0$、$z$ 的
+	选取只给结论不给动机。更令人困扰的是几处不一致：引言中 $\Pi_{l_2}(t)$ 的内积间隙
+	写作 $1/\sqrt{t}$，正文定义与推导却用 $2/\sqrt{t}$；一元编码长度按定义为 $4z$，
+	文中却记比特串长为 $(4z+1)d$。这些不影响结论的正确性，但显著增加了独立复现的
+	时间成本——本组在第 5 节的整理中不得不逐一核对原文两处的版本。
+	
+	\paragraph{4. 结构性直觉着墨不足。}
+	为什么“内积判定”天然具有 $\Omega(1/\eps^2)$ 的复杂度？为什么嵌入必须绕道 $l_1$？
+	论文把这些问题留给读者自行体会，证明读起来像一连串精巧但偶然的代数巧合。直到
+	后来 Gap-Hamming 视角成熟后，“$1/\eps^2$ 来自中心极限定理尺度的涨落
+	（$\sqrt{n}$ 级别的汉明距离间隙）”这一清晰图景才被社区普遍接受。如果论文能给出
+	这一高层叙事，其可读性和影响力还会更进一步。
+	
+	\subsection{对后续研究的影响}
+	
+	\paragraph{下界侧：Gap-Hamming 谱系与“全参数最优”的收尾。}
+	本文遗留的两个 gap——$\eps$ 适用范围与证明的经济性——很快被填平：
+	Woodruff~\cite{Woo04} 直接在 Hamming 空间构造，把 $\Omega(1/\eps^2)$ 推进到最优
+	范围 $1/\eps \leq m^{1/2}$；Jayram et al.~\cite{JKS08}、Brody--Chakrabarti~\cite{BC09}、
+	Chakrabarti--Regev~\cite{CR11} 沿本文提出的 Gap-Hamming 问题逐级推进，最终以
+	任意轮数的 $\Omega(n)$ 最优通信下界收尾，使 $\Fzero$ 的 $\Omega(1/\eps^2)$ 下界
+	对全参数范围乃至多趟扫描都成立。Jayram--Woodruff~\cite{JW13} 进一步把
+	$\Omega(\eps^{-2}\log(1/\delta))$ 纳入下界，封闭了 $\delta$ 维度。可以说，本文之后
+	$\Fzero$ 下界研究的每一步都是在“修缮”而非“推翻”本文的结论。
+	
+	\paragraph{上界侧：刺激最优算法的诞生。}
+	下界钉死了 $1/\eps^2$ 之后，算法设计的目标变得明确：消去 $\log\log m$ 与
+	$\log(1/\eps)$ 的残余因子。Kane--Nelson--Woodruff~\cite{KNW10} 的
+	$O(1/\eps^2 + \log m)$ 与 Błasiok~\cite{Bla18} 的
+	$O(\eps^{-2}\log(1/\delta) + \log m)$ 先后达标，且两文的作者都明确以本文下界为
+	对标。上下界在 2018 年于全部参数维度闭合，$\Fzero$ 估计成为数据流模型中第一个
+	复杂度被完全刻画的基本问题——这个“完结篇”的第一章是本文写的。
+	
+	\paragraph{范式侧：通信复杂性驱动的流式下界方法论。}
+	本文巩固并升级了 AMS 开创的“流算法空间 $\geq$ 单向通信复杂度”范式：此后证明
+	流式下界的标准动作变成“设计/借用合适的 promise 通信问题 $\to$ 信息论工具下界
+	$\to$ 嵌入或编码约化到目标问题”。这套方法论外溢到分布式函数监控、消息传递模型
+	（如 Woodruff--Zhang 关于分布式 $\Fzero$ 的最优下界）、图流、乃至近年对抗鲁棒流
+	（adversarially robust streaming）的分离结果中，本文的约化技巧始终是这些工作的
+	技术底色。
+	
+	\paragraph{实践侧：为工程界的对数级空间正名。}
+	HyperLogLog~\cite{HLL07} 等工业标准算法用 $\log\log m$ 级寄存器换取常数相对误差；
+	本文及其后续工作从反面证明了：要把相对误差压到 $\eps$，$\Theta(1/\eps^2)$ 的空间
+	代价一分都不能少。理论下界与工程上界的合流，让“基数估计该花多少内存”第一次有了
+	精确的答案，也为后续 Pettie--Wang 等人关于基数估计信息论极限（Fisher 信息视角）
+	的更精细研究提供了基准。
+	
+	\subsection{本组的理解过程与心得（可选）}
+	
+	\section{总结}
+	
+	\begin{thebibliography}{99}
+		
+		\bibitem{IW03} P. Indyk and D. P. Woodruff.
+		Tight lower bounds for the distinct elements problem.
+		In \emph{Proc. 44th IEEE Symposium on Foundations of Computer Science (FOCS)},
+		pages 283--288, 2003.
+		
+		\bibitem{FM85} P. Flajolet and G. N. Martin.
+		Probabilistic counting algorithms for data base applications.
+		\emph{Journal of Computer and System Sciences}, 31(2):182--209, 1985.
+		
+		\bibitem{AMS99} N. Alon, Y. Matias, and M. Szegedy.
+		The space complexity of approximating the frequency moments.
+		In \emph{Proc. 28th ACM STOC}, pages 20--29, 1996;
+		journal version: \emph{Journal of Computer and System Sciences}, 58(1):137--147, 1999.
+		
+		\bibitem{BJKST02} Z. Bar-Yossef, T. S. Jayram, R. Kumar, D. Sivakumar, and L. Trevisan.
+		Counting distinct elements in a data stream.
+		In \emph{Proc. 6th International Workshop on Randomization and Approximation
+			Techniques (RANDOM)}, LNCS 2483, pages 1--10, 2002.
+		
+		\bibitem{BarYossef02} Z. Bar-Yossef.
+		\emph{The Complexity of Massive Data Set Computations}.
+		Ph.D. thesis, University of California, Berkeley, 2002.
+		
+		\bibitem{Yao77} A. C.-C. Yao.
+		Probabilistic computations: Toward a unified measure of complexity.
+		In \emph{Proc. 18th IEEE FOCS}, pages 222--227, 1977.
+		
+		\bibitem{VC71} V. N. Vapnik and A. Y. Chervonenkis.
+		On the uniform convergence of relative frequencies of events to their probabilities.
+		\emph{Theory of Probability and its Applications}, 16(2):264--280, 1971.
+		
+		\bibitem{KNR99} I. Kremer, N. Nisan, and D. Ron.
+		On randomized one-round communication complexity.
+		\emph{Computational Complexity}, 8(1):21--49, 1999.
+		
+		\bibitem{BYJKS02} Z. Bar-Yossef, T. S. Jayram, R. Kumar, and D. Sivakumar.
+		An information statistics approach to data stream and communication complexity.
+		In \emph{Proc. 17th IEEE Conference on Computational Complexity (CCC)},
+		pages 93--102, 2002.
+		
+		\bibitem{FLM77} T. Figiel, J. Lindenstrauss, and V. D. Milman.
+		The dimension of almost spherical sections of convex bodies.
+		\emph{Acta Mathematica}, 139:53--94, 1977.
+		
+		\bibitem{Indyk00} P. Indyk.
+		Stable distributions, pseudorandom generators, embeddings and data stream computation.
+		In \emph{Proc. 41st IEEE FOCS}, pages 189--197, 2000;
+		journal version: \emph{Journal of the ACM}, 53(3):307--323, 2006.
+		
+		\bibitem{Indyk01} P. Indyk.
+		Algorithmic applications of low-distortion geometric embeddings.
+		In \emph{Proc. 42nd IEEE FOCS} (invited talk), pages 10--33, 2001.
+		
+		\bibitem{Woo04} D. P. Woodruff.
+		Optimal space lower bounds for all frequency moments.
+		In \emph{Proc. 15th ACM-SIAM SODA}, pages 167--175, 2004.
+		
+		\bibitem{GT01} P. B. Gibbons and S. Tirthapura.
+		Estimating simple functions on the union of data streams.
+		In \emph{Proc. 13th ACM SPAA}, pages 281--291, 2001.
+		
+		\bibitem{DF03} M. Durand and P. Flajolet.
+		Loglog counting of large cardinalities.
+		In \emph{Proc. 11th European Symposium on Algorithms (ESA)}, LNCS 2832,
+		pages 605--617, 2003.
+		
+		\bibitem{HLL07} P. Flajolet, \'E. Fusy, O. Gandouet, and F. Meunier.
+		HyperLogLog: The analysis of a near-optimal cardinality estimation algorithm.
+		In \emph{Proc. 18th International Meeting on Probabilistic, Combinatorial and
+			Asymptotic Methods for the Analysis of Algorithms (AofA)}, DMTCS Proceedings,
+		pages 127--146, 2007.
+		
+		\bibitem{JKS08} T. S. Jayram, R. Kumar, and D. Sivakumar.
+		The one-way communication complexity of Hamming distance.
+		\emph{Theory of Computing}, 4(1):129--135, 2008.
+		
+		\bibitem{BC09} J. Brody and A. Chakrabarti.
+		A multi-round communication lower bound for Gap Hamming and some consequences.
+		In \emph{Proc. 24th IEEE Conference on Computational Complexity (CCC)},
+		pages 358--368, 2009.
+		
+		\bibitem{CR11} A. Chakrabarti and O. Regev.
+		An optimal lower bound on the communication complexity of Gap-Hamming-Distance.
+		In \emph{Proc. 43rd ACM STOC}, pages 51--60, 2011;
+		journal version: \emph{SIAM Journal on Computing}, 41(5):1299--1317, 2012.
+		
+		\bibitem{KNW10} D. M. Kane, J. Nelson, and D. P. Woodruff.
+		An optimal algorithm for the distinct elements problem.
+		In \emph{Proc. 29th ACM PODS}, pages 41--52, 2010.
+		
+		\bibitem{JW13} T. S. Jayram and D. P. Woodruff.
+		Optimal bounds for Johnson--Lindenstrauss transforms and streaming problems
+		with subconstant error.
+		In \emph{Proc. 22nd ACM-SIAM SODA}, pages 1--10, 2011;
+		journal version: \emph{ACM Transactions on Algorithms}, 9(3):26:1--26:17, 2013.
+		
+		\bibitem{Bla18} J. B\l asiok.
+		Optimal streaming and tracking distinct elements with high probability.
+		In \emph{Proc. 29th ACM-SIAM SODA}, pages 2432--2448, 2018;
+		journal version: \emph{ACM Transactions on Algorithms}, 16(1):3:1--3:28, 2020.
+		
+		\bibitem{Woo09} D. P. Woodruff.
+		The average-case complexity of counting distinct elements.
+		In \emph{Proc. 12th International Conference on Database Theory (ICDT)},
+		pages 284--295, 2009.
+		
+		\bibitem{CVM22} S. Chakraborty, N. V. Vinodchandran, and K. S. Meel.
+		Distinct elements in streams: An algorithm for the (text) book.
+		In \emph{Proc. 30th European Symposium on Algorithms (ESA)}, LIPIcs 244,
+		pages 34:1--34:6, 2022.
+	\end{thebibliography}
+	
 \end{document}
